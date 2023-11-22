@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const PoenCard = () => {
   const [row, setRow] = useState(0);
@@ -13,6 +13,10 @@ const PoenCard = () => {
     "Drives Night along with them from Heav'n, and strikes",
     "The Sultan's Turret with a Shaft of Light.",
   ];
+
+  useEffect(() => {
+    setWrongInputCount(0);
+  }, []);
 
   const keyPressed = (event: React.KeyboardEvent) => {
     const { key } = event;
@@ -48,12 +52,12 @@ const PoenCard = () => {
         setPlaying(true);
       }}
       tabIndex={0}
-      onKeyDownCapture={keyPressed}
+      onKeyDownCapture={playing===true ? keyPressed:undefined}
       className="flex  items-center justify-center mt-10 outline-none"
     >
       {!playing ? (
         <div>
-          {wrongInputCount > 0 && <p className="text-2xl">{wrongInputCount}</p>}
+          {wrongInputCount > 0 && <p className="text-2xl text-center">{wrongInputCount}</p>}
           <p className="text-2xl">Click Here</p>
         </div>
       ) : (
