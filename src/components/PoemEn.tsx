@@ -62,9 +62,7 @@ const PoenCard = () => {
         </div>
       ) : (
         <>
-          <p>
-            {" "}
-            {wrongInputCount}
+          <div>
             {lines.map((line, i) => {
               return (
                 <p>
@@ -73,34 +71,18 @@ const PoenCard = () => {
                 </p>
               );
             })}
-          </p>
-          <p>
-            {lines.map((line, i) => {
-              return i !== row ? (
-                <p className="opacity-40"> {line} </p>
-              ) : (
-                <p>
-                  {line.split("").map((char, j) => {
-                    if (j === col)
-                      return (
-                        <span
-                          className={`opacity-50 underline ${
-                            wrongInput ? "text-red-700" : ""
-                          }`}
-                        >
-                          {char}
-                        </span>
-                      );
-                    return (
-                      <span className={col >= j ? "opacity-100" : "opacity-40"}>
-                        {char}
-                      </span>
-                    );
-                  })}
-                </p>
-              );
-            })}
-          </p>
+          </div>
+          <div>
+          {lines.map((line, i) => {
+            return i!==row ? <p className="opacity-40"> {line} </p> :
+                    <p>
+                        {line.split('').map((char, j) => {
+                            if(j===col) return <span className={`opacity-50 underline ${wrongInput ? 'text-red-700' : ''}`} >{char}</span>
+                            return <span className={col>=j ? 'opacity-100' : 'opacity-40'} >{char}</span>   
+                            })}
+                        </p>
+             })}
+             </div>
         </>
       )}
     </div>
