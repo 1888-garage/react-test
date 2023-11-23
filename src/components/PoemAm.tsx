@@ -1,109 +1,61 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import { conversionMap } from "../constants/letterMap";
 
 const PoenCardAm = () => {
     const [row, setRow] = useState(0);
     const [col, setCol] = useState(0);
     const [playing, setPlaying] = useState(false);
     const [wrongInput, setWrongInput] = useState(false);
+    const [wrongInputCount, setWrongInputCount] = useState(0);
     const [chars, setChars] = useState("");
-    const inputRef = useRef(null);
     const lines = [
         "መሙሚማሜምሞ",
         "ሰሱሲሳሴስሶ",
-        "በቡቢባቤብቦ",
-        "አኡኢኣኤእኦ",
-        "ጸጹጺጻጼጽጾ",
+        "በቡቢባቤብቦ"
     ];
 
     const latinToAm = (char: string) => {
-        const conversionMap = {
-            // Single-letter Amharic characters
-            a: "ሀ",
-            b: "በ",
-            c: "ኸ",
-            d: "ደ",
-            e: "አ",
-            f: "ፈ",
-            g: "ገ",
-            h: "ሀ",
-            i: "ኢ",
-            j: "ጅ",
-            k: "ከ",
-            l: "ለ",
-            m: "መ",
-            n: "ነ",
-            o: "ኦ",
-            p: "ፕ",
-            q: "ቅ",
-            r: "ር",
-            s: "ሠ",
-            t: "ተ",
-            u: "ኡ",
-            v: "ቭ",
-            w: "ው",
-            x: "ክ",
-            y: "ይ",
-            z: "ዝ",
-            A: "ሀ",
-            B: "በ",
-            C: "ኸ",
-            D: "ደ",
-            E: "አ",
-            F: "ፈ",
-            G: "ገ",
-            H: "ሀ",
-            I: "ኢ",
-            J: "ጅ",
-            K: "ከ",
-            L: "ለ",
-            M: "መ",
-            N: "ነ",
-            O: "ኦ",
-            P: "ፕ",
-            Q: "ቅ",
-            R: "ር",
-            S: "ሠ",
-            T: "ተ",
-            U: "ኡ",
-            V: "ቭ",
-            W: "ው",
-            X: "ክ",
-            Y: "ይ",
-            Z: "ዝ",
-        };
-        let bash = ''
-        if (char === ' ') {
-            bash = ' '
+        const charaSet = conversionMap[char.toLowerCase()];
+        if (char.length > 2) {
+            setChars("");
         }
-        let convertedChar = conversionMap[char.toLowerCase()] || bash;
-        setChars((prevChars) => prevChars + convertedChar);
 
-    }
-
-    useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, []);
+        return charaSet;
+    };
 
     const keyPressed = (event: React.KeyboardEvent) => {
         const { key } = event;
+        console.log(key)
         if (key.length > 1) return;
-        if (key === "Backspace") {
-            if (chars.length > 0) {
-                setChars(chars.slice(0, -1));
-            }
-            return;
+        let amharicChar = "";
+        if (col === 0 && row === 0 && wrongInput === false) {
+            setWrongInputCount(0);
+        }
+        console.log(chars, "chars")
+        if (chars.length > 0) {
+            setChars(chars + key);
+            amharicChar = latinToAm(chars + key);
+        } else {
+            setChars(key);
+            amharicChar = latinToAm(key);
         }
 
         const expected = lines[row][col];
-        console.log(expected, "error", key, 'key', row, col)
-        latinToAm(key);
+        const keys = Object.keys(conversionMap);
+        const foundKey = keys.find(key => conversionMap[key] === expected);
 
-        if (expected === key) {
+        if (foundKey && !foundKey.startsWith(chars + key)) {
+            setChars("");
+        }
+
+        if (expected === amharicChar) {
             setWrongInput(false);
+            setChars("");
             if (col === lines[row].length - 1) {
                 if (row === lines.length - 1) {
+                    setPlaying(false);
+                    setRow(0);
+                    setCol(0);
                     return;
                 }
                 setRow(row + 1);
@@ -111,24 +63,25 @@ const PoenCardAm = () => {
             } else {
                 setCol(col + 1);
             }
-        } else {
-            console.log('wrong key');
-            setWrongInput(true);
         }
-    }
+        else {
+            if (amharicChar === undefined) {
+                setWrongInputCount(wrongInputCount + 1);
+                setWrongInput(true);
+            }
+            if ((chars + key).length > 2) {
+                setWrongInputCount(wrongInputCount + 1);
+                setWrongInput(true);
+            }
+        }
+    };
     return (
         <div className="outline-none" onFocus={() => { setPlaying(true) }}
-            // onBlur={() => { setPlaying(false) }}
+            onBlur={() => { setPlaying(false) }}
             tabIndex={0} onKeyDownCapture={keyPressed}>
             {playing &&
                 <div className="flex items-center justify-center mt-10 outline-none">
-                    <textarea
-                        value={chars}
-                        ref={inputRef}
-                        onChange={(event) => event.nativeEvent['inputType'] === 'deleteContentBackward' ?
-                            setChars(event.target.value) : ''}
-                        className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 h-[100px] w-[90%] text-xl text-[#717082]"
-                    />
+                    <p className="text-red-700 text-2xl">{wrongInputCount}</p>
                 </div>
             }
             <div
@@ -139,7 +92,7 @@ const PoenCardAm = () => {
                             <div>
                                 {lines.map((line, i) => {
                                     return (
-                                        <div key={i} className="mb-5">
+                                        <div key={i} className="mb-0">
                                             {i === row ? '👉' : ' '}
                                             &nbsp;&nbsp;
                                         </div>
@@ -148,17 +101,16 @@ const PoenCardAm = () => {
                             </div>
                             <div>
                                 {lines.map((line, i) => {
-                                    return (
+                                    return i !== row ? <p className="opacity-40"> {line} </p> : (
                                         <div key={i} className="mb-1 p-1">
 
                                             {line.split('').map((char, j) => {
-                                                if (j === col) return (<div onClick={() => setChars((prevChars) => prevChars + char)} key={j} className={`opacity-100 underline mr-2 hover:border rounded-md  hover:bg-red-300 hover:opacity-100 border [w-50px] [h-50px] inline-flex p-2 justify-center cursor-pointer ${wrongInput ? 'text-red-700' : ''}`} ><span className="w-[20px] text-center">{char}</span></div>)
+                                                if (j === col) return (<div key={j} className={`opacity-100 underline mr-2 hover:border rounded-md  hover:bg-red-300 hover:opacity-100 border [w-50px] [h-50px] inline-flex p-2 justify-center cursor-pointer ${wrongInput ? 'bg-red-700 text-white' : ''}`} ><span className="w-[20px] text-center">{char}</span></div>)
                                                 return (
                                                     <div
                                                         key={j}
                                                         className={`${col >= j ? 'opacity-100' : 'opacity-100'
-                                                            } mr-2 hover:border rounded-md  hover:bg-red-300 hover:opacity-100 border [w-50px] [h-50px] inline-flex p-2 justify-center cursor-pointer`}
-                                                        onClick={() => setChars((prevChars) => prevChars + char)}>
+                                                            } mr-2 hover:border rounded-md  hover:bg-red-300 hover:opacity-100 border [w-50px] [h-50px] inline-flex p-2 justify-center cursor-pointer`}>
                                                         <span className="w-[20px] text-center">{char}</span>
                                                     </div>
                                                 );
