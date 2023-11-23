@@ -1,10 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import PoenCard from "../components/PoemEn";
-import PoenCardAm from "../components/PoemAm";
 ---
 
-<Layout title="home">
-    <h1 class="text-center mt-10 text-xl">English</h1>
-    <PoenCard client:load />
+<Layout title="home" path="/">
+  <h1 class="text-center mt-10 text-xl">English</h1>
+  <PoenCard client:load />
 </Layout>
