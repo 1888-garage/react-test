@@ -6,7 +6,6 @@ const PoenCardAm = () => {
     const [col, setCol] = useState(0);
     const [playing, setPlaying] = useState(false);
     const [wrongInput, setWrongInput] = useState(false);
-    const [wrongInputCount, setWrongInputCount] = useState(0);
     const [chars, setChars] = useState("");
     const lines = [
         "መሙሚማሜምሞ",
@@ -25,13 +24,8 @@ const PoenCardAm = () => {
 
     const keyPressed = (event: React.KeyboardEvent) => {
         const { key } = event;
-        console.log(key)
         if (key.length > 1) return;
         let amharicChar = "";
-        if (col === 0 && row === 0 && wrongInput === false) {
-            setWrongInputCount(0);
-        }
-        console.log(chars, "chars")
         if (chars.length > 0) {
             setChars(chars + key);
             amharicChar = latinToAm(chars + key);
@@ -65,12 +59,7 @@ const PoenCardAm = () => {
             }
         }
         else {
-            if (amharicChar === undefined) {
-                setWrongInputCount(wrongInputCount + 1);
-                setWrongInput(true);
-            }
-            if ((chars + key).length > 2) {
-                setWrongInputCount(wrongInputCount + 1);
+            if ((chars + key).length > 2 || amharicChar === undefined) {
                 setWrongInput(true);
             }
         }
@@ -79,11 +68,6 @@ const PoenCardAm = () => {
         <div className="outline-none" onFocus={() => { setPlaying(true) }}
             onBlur={() => { setPlaying(false) }}
             tabIndex={0} onKeyDownCapture={keyPressed}>
-            {playing &&
-                <div className="flex items-center justify-center mt-10 outline-none">
-                    <p className="text-red-700 text-2xl">{wrongInputCount}</p>
-                </div>
-            }
             <div
                 className="flex items-center justify-center mt-10 outline-none">
                 {
@@ -101,11 +85,11 @@ const PoenCardAm = () => {
                             </div>
                             <div>
                                 {lines.map((line, i) => {
-                                    return i !== row ? <p className="opacity-40"> {line} </p> : (
+                                    return i !== row ? <p key={i} className="opacity-40"> {line} </p> : (
                                         <div key={i} className="mb-1 p-1">
 
                                             {line.split('').map((char, j) => {
-                                                if (j === col) return (<div key={j} className={`opacity-100 underline mr-2 hover:border rounded-md  hover:bg-red-300 hover:opacity-100 border [w-50px] [h-50px] inline-flex p-2 justify-center cursor-pointer ${wrongInput ? 'bg-red-700 text-white' : ''}`} ><span className="w-[20px] text-center">{char}</span></div>)
+                                                if (j === col) return (<div key={j} className={`opacity-100 underline mr-2 hover:border rounded-md  hover:bg-red-300 hover:opacity-100 border [w-50px] [h-50px] inline-flex p-2 justify-center cursor-pointer ${wrongInput ? 'bg-red-700 text-white text-xl p-1' : ''}`} ><span className="w-[20px] text-center">{char}</span></div>)
                                                 return (
                                                     <div
                                                         key={j}
