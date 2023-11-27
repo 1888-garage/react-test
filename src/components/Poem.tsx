@@ -5,6 +5,7 @@ const PoenCard = ({ amharic }: { amharic: boolean }) => {
   const [col, setCol] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [wrongInput, setWrongInput] = useState(false);
+  const [display, setDisplay] = useState(false);
   const [correctCount, setCorrectCount] = useState<number>(0);
   const [incorrectCount, setIncorrectCount] = useState<number>(0);
   const [chars, setChars] = useState("");
@@ -45,6 +46,8 @@ const PoenCard = ({ amharic }: { amharic: boolean }) => {
 
         if (col === lines[row].length - 1) {
           if (row === lines.length - 1) {
+            setDisplay(true);
+
             console.log("All characters typed correctly!");
             return;
           }
@@ -76,6 +79,7 @@ const PoenCard = ({ amharic }: { amharic: boolean }) => {
           if (row === lines.length - 1) {
             console.log("c:" + correctCount, "i:" + incorrectCount);
             console.log("All characters typed correctly!");
+            setDisplay(true);
             return;
           }
 
@@ -128,14 +132,14 @@ const PoenCard = ({ amharic }: { amharic: boolean }) => {
       onKeyDown={handleKeyPress}
       className="flex items-center justify-center mt-10 outline-none"
     >
-      {!playing ? (
+      {!playing && !display ? (
         <button
           onClick={() => setPlaying(true)}
           className="text-2xl bg-green-500 text-white rounded p-4"
         >
           {amharic ? <span>ይንኩኝ</span> : <span>Click Here</span>}
         </button>
-      ) : (
+      ) : !display ? (
         <>
           <p>
             {lines.map((line, i) => (
@@ -159,6 +163,13 @@ const PoenCard = ({ amharic }: { amharic: boolean }) => {
             ))}
           </p>
         </>
+      ) : null}
+
+      {display && (
+        <div className="flex gap-4 bg-blue-500 p-4 rounded">
+          <div className="text-white text-3xl">corect:{correctCount}</div>
+          <div className="text-white text-3xl">incorrect:{incorrectCount}</div>
+        </div>
       )}
     </div>
   );
