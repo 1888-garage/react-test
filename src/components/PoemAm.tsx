@@ -9,16 +9,14 @@ const PoenCardAm = () => {
   const [wrongCount, setWrongCount] = useState(0);
   const [chars, setChars] = useState("");
 
-  const lines = ["አ", "በ", "መሰ"];
+  const lines = ["አኡኢ"];
 
   const latinToAm = (char: string) => {
-    // Implement your English to Amharic conversion logic here
     // This is a simple example and may not cover all cases
     const amharicMapping: Record<string, string> = {
       a: "አ",
-      b: "በ",
-      m: "መ",
-      s: "ሰ",
+      u: "ኡ",
+      i: "ኢ",
 
       // Add more mappings as needed
     };

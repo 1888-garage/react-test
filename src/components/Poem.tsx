@@ -11,7 +11,7 @@ const PoenCard = ({ amharic }: { amharic: boolean }) => {
   const [chars, setChars] = useState("");
 
   const lines = amharic
-    ? ["አ", "በ", "መሰ"]
+    ? ["መሙሚማሜምሞ", "ሰሱሲሳሴስሶ", "በቡቢባቤብቦ"]
     : [
         "Wake! For the Sun, who scatter'd into flight",
         "The Stars before him from the Field of Night,",
