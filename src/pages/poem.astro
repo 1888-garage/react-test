@@ -1,0 +1,9 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PoemCom from "../components/Poem";
+---
+
+<Layout title="Home" path="pome">
+  <h1 class="text-center mt-2 text-2xl text-[#717082]">Selcte Your Language</h1>
+  <PoemCom languge="am" client:load />
+</Layout>
