@@ -1,11 +1,17 @@
 import React from "react";
 
 function TestResultCard(props) {
-  const { totalStroke, wrongStroke, wordPerMinute } = props;
+  const {
+    totalStroke,
+    wrongStroke,
+    wordPerMinute,
+    mostFrequentMistake,
+    mostFrequentMistakeCount,
+  } = props;
 
   return (
     <div>
-      <div className="bg-slate-200 w-64 h-40 rounded-lg my-6 shadow-md">
+      <div className="bg-slate-200 w-72 h-30 rounded-lg my-6 shadow-md">
         <div className="card__content px-6 py-3">
           <div className="flex justify-center">
             <h1 className="text-xl font-black text-[#20b327]">
@@ -26,13 +32,13 @@ function TestResultCard(props) {
               {(((totalStroke - wrongStroke) / totalStroke) * 100).toFixed(2)}%
             </p>
           </div>
+
           <div className="flex justify-between">
-            <h1>Correct words: </h1>
-            <p className="text-[#20b327]">7</p>
-          </div>
-          <div className="flex justify-between">
-            <h1>Wrong words: </h1>
-            <p className="text-[#f83333]">3</p>
+            <h1>frequently mistyped: </h1>
+            <div className="flex">
+              <p className="text-[#f83333]">{mostFrequentMistake}</p>
+              <p className="ml-1">{`(${mostFrequentMistakeCount})`}</p>
+            </div>
           </div>
         </div>
       </div>

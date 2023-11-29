@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import TestResultCard from "./TestResultCard.jsx";
 
 const PoenCard = () => {
@@ -13,28 +13,36 @@ const PoenCard = () => {
   const [wpm, setWpm] = useState(null); // Words Per Minute
 
   const [wrongCount, setWrongCount] = useState(0);
-  const [storkCount, setStorkCount] = useState(0);
+  const [strokeCount, setStrokeCount] = useState(0);
 
-  const lines = ["asher samuel"];
+  // Use an array to store mistyped characters and their counts
+  const [mistypedChars, setMistypedChars] = useState([]);
 
-  const keyPressed = (event: React.KeyboardEvent) => {
+  const lines = [
+    "Wake! For the Sun, who scatter'd into flight",
+    "The Stars before him from the Field of Night,",
+    "Drives Night along with them from Heav'n, and strikes",
+    "The Sultan's Turret with a Shaft of Light.",
+  ];
+
+  const keyPressed = (event) => {
     const { key } = event;
     if (key.length > 1) return;
 
     if (!startTime) {
-      // start timer
+      // Start timer
       setStartTime(new Date());
     }
 
     const expected = lines[row][col];
-    setStorkCount(storkCount + 1);
+    setStrokeCount(strokeCount + 1);
 
     if (expected === key) {
       setWrongInput(false);
       if (col === lines[row].length - 1) {
         if (row === lines.length - 1) {
-          setEndTime(new Date()); // end the timer
-          setTestEnded(true); // End of the test
+          setEndTime(new Date());
+          setTestEnded(true);
           return;
         }
         setRow(row + 1);
@@ -44,12 +52,30 @@ const PoenCard = () => {
       }
     } else {
       setWrongCount(wrongCount + 1);
-      // console.log("wrong key");
       setWrongInput(true);
+
+      setMistypedChars((prevMistypedChars) => {
+        const mistypedChar = expected.toLowerCase();
+        const existingIndex = prevMistypedChars.findIndex(
+          (item) => item.char === mistypedChar
+        );
+
+        if (existingIndex !== -1) {
+          // If the mistyped character already exists, update its count
+          prevMistypedChars[existingIndex].count += 1;
+        } else {
+          // If the mistyped character is new, add it to the array
+          prevMistypedChars.push({ char: mistypedChar, count: 1 });
+        }
+
+        // Sort the array based on count in descending order
+        prevMistypedChars.sort((a, b) => b.count - a.count);
+
+        return [...prevMistypedChars];
+      });
     }
   };
 
-  // Calculate WPM when the test ends
   useEffect(() => {
     if (endTime) {
       const minutes = (endTime - startTime) / (1000 * 60);
@@ -59,6 +85,11 @@ const PoenCard = () => {
       setWpm(wordPerMinute);
     }
   }, [endTime, startTime, lines]);
+
+  // To get the most frequent mistyped character
+  const getMostFrequentMistake = (mistypedChars) => {
+    return mistypedChars.length > 0 ? mistypedChars[0] : null;
+  };
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -116,9 +147,15 @@ const PoenCard = () => {
       </div>
       {testEnded && (
         <TestResultCard
-          totalStroke={storkCount}
+          totalStroke={strokeCount}
           wrongStroke={wrongCount}
           wordPerMinute={wpm}
+          mostFrequentMistake={
+            getMostFrequentMistake(mistypedChars)?.char || ""
+          }
+          mostFrequentMistakeCount={
+            getMostFrequentMistake(mistypedChars)?.count || 0
+          }
         />
       )}
     </div>

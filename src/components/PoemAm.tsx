@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import TestResultCard from "./TestResultCard.jsx";
 
 const PoenCardAm = () => {
@@ -14,8 +14,9 @@ const PoenCardAm = () => {
 
   const [wrongCount, setWrongCount] = useState(0);
   const [strokeCount, setStrokeCount] = useState(0);
+  const [mistypedChars, setMistypedChars] = useState([]);
 
-  const lines = ["ምመሞሙ"];
+  const lines = ["መሙሚማሜምሞ", "ሰሱሲሳሴስሶ", "በቡቢባቤብቦ"];
 
   const amharicLatinConversion = {
     b: { e: "በ", u: "ቡ", i: "ቢ", a: "ባ", ee: "ቤ", "": "ብ", o: "ቦ" },
@@ -78,6 +79,8 @@ const PoenCardAm = () => {
     }
 
     const expected = lines[row][col];
+    setStrokeCount(strokeCount + 1);
+
     getKeyByValue(expected, key);
 
     if (expected === amhChar) {
@@ -85,11 +88,8 @@ const PoenCardAm = () => {
       setChars("");
       if (col === lines[row].length - 1) {
         if (row === lines.length - 1) {
-          setPlaying(false);
-          setRow(0);
-          setCol(0);
-          setEndTime(new Date()); // end the timer
-          setTestEnded(true); // End of the test
+          setEndTime(new Date());
+          setTestEnded(true);
           return;
         }
         setRow(row + 1);
@@ -102,11 +102,27 @@ const PoenCardAm = () => {
       if (amhChar === undefined || (chars + key).length > 2) {
         setWrongCount(wrongCount + 1);
         setWrongInput(true);
+
+        setMistypedChars((prevMistypedChars) => {
+          const mistypedChar = expected.toLowerCase();
+          const existingIndex = prevMistypedChars.findIndex(
+            (item) => item.char === mistypedChar
+          );
+
+          if (existingIndex !== -1) {
+            prevMistypedChars[existingIndex].count += 1;
+          } else {
+            prevMistypedChars.push({ char: mistypedChar, count: 1 });
+          }
+
+          prevMistypedChars.sort((a, b) => b.count - a.count);
+
+          return [...prevMistypedChars];
+        });
       }
     }
   };
 
-  // Calculate WPM when the test ends
   useEffect(() => {
     if (endTime) {
       const minutes = (endTime - startTime) / (1000 * 60);
@@ -116,6 +132,10 @@ const PoenCardAm = () => {
       setWpm(wordPerMinute);
     }
   }, [endTime, startTime, lines]);
+
+  const getMostFrequentMistake = (mistypedChars) => {
+    return mistypedChars.length > 0 ? mistypedChars[0] : null;
+  };
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -173,6 +193,12 @@ const PoenCardAm = () => {
           totalStroke={strokeCount}
           wrongStroke={wrongCount}
           wordPerMinute={wpm}
+          mostFrequentMistake={
+            getMostFrequentMistake(mistypedChars)?.char || ""
+          }
+          mostFrequentMistakeCount={
+            getMostFrequentMistake(mistypedChars)?.count || 0
+          }
         />
       )}
     </div>
