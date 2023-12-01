@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from "react";
 import TestResultCard from "./TestResultCard.jsx";
 
-const PoenCardAm = () => {
+const Poem = ({ lang }) => {
   const [row, setRow] = useState(0);
   const [col, setCol] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [wrongInput, setWrongInput] = useState(false);
-  const [testEnded, setTestEnded] = useState(false); // Track if the test has ended
+  const [testEnded, setTestEnded] = useState(false);
 
-  const [startTime, setStartTime] = useState(null); // Track the start time
-  const [endTime, setEndTime] = useState(null); // Track the end time
-  const [wpm, setWpm] = useState(null); // Words Per Minute
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+  const [wpm, setWpm] = useState(null);
 
   const [wrongCount, setWrongCount] = useState(0);
   const [strokeCount, setStrokeCount] = useState(0);
   const [mistypedChars, setMistypedChars] = useState([]);
 
-  const lines = ["መሙሚማሜምሞ", "ሰሱሲሳሴስሶ", "በቡቢባቤብቦ"];
+  const lines =
+    lang === "am"
+      ? ["መሙሚማሜምሞ", "ሰሱሲሳሴስሶ", "በቡቢባቤብቦ"]
+      : [
+          "Wake! For the Sun, who scatter'd into flight",
+          "The Stars before him from the Field of Night,",
+          "Drives Night along with them from Heav'n, and strikes",
+          "The Sultan's Turret with a Shaft of Light.",
+        ];
 
   const amharicLatinConversion = {
     b: { e: "በ", u: "ቡ", i: "ቢ", a: "ባ", ee: "ቤ", "": "ብ", o: "ቦ" },
@@ -28,18 +36,23 @@ const PoenCardAm = () => {
   const [chars, setChars] = useState("");
 
   const latinToAm = (char) => {
-    const lowercaseEn = char.toLowerCase();
-    const consonant = lowercaseEn[0];
-    const vowel = lowercaseEn.slice(1);
-    const amhChar =
-      amharicLatinConversion[consonant] &&
-      amharicLatinConversion[consonant][vowel];
+    if (lang === "am") {
+      const lowercaseEn = char.toLowerCase();
+      const consonant = lowercaseEn[0];
+      const vowel = lowercaseEn.slice(1);
+      const amhChar =
+        amharicLatinConversion[consonant] &&
+        amharicLatinConversion[consonant][vowel];
 
-    if (char.length > 2) {
-      setChars("");
+      if (char.length > 2) {
+        setChars("");
+      }
+
+      return amhChar || "";
+    } else {
+      // For English, you may need a different logic or just return the input character
+      return char;
     }
-
-    return amhChar || "";
   };
 
   useEffect(() => {
@@ -49,9 +62,16 @@ const PoenCardAm = () => {
   }, [wrongInput]);
 
   const getKeyByValue = (char, current) => {
-    for (const key in amharicLatinConversion) {
-      if (amharicLatinConversion[key] === char) {
-        key.slice(0, chars.length + 1) !== chars + current && setChars("");
+    if (lang === "am") {
+      for (const key in amharicLatinConversion) {
+        if (amharicLatinConversion[key][current] === char) {
+          key.slice(0, chars.length + 1) !== chars + current && setChars("");
+        }
+      }
+    } else {
+      // Handling for English
+      if (char.toLowerCase() !== current.toLowerCase()) {
+        setChars("");
       }
     }
   };
@@ -60,19 +80,20 @@ const PoenCardAm = () => {
     const { key } = event;
     if (key.length > 1) return;
     if (!startTime) {
-      // Start timer
       setStartTime(new Date());
     }
 
     let amhChar = "";
+    let newChars = chars; // Initialize newChars with the current value of chars
 
     if (col === 0 && row === 0 && wrongInput === false) {
       setWrongCount(0);
     }
 
-    if (chars.length > 0) {
-      setChars(chars + key);
-      amhChar = latinToAm(chars + key);
+    if (chars.length > 0 && key !== " ") {
+      newChars = chars + key;
+      setChars(newChars);
+      amhChar = latinToAm(newChars);
     } else {
       setChars(key);
       amhChar = latinToAm(key);
@@ -99,7 +120,7 @@ const PoenCardAm = () => {
       }
       setStrokeCount(strokeCount + 1);
     } else {
-      if (amhChar === undefined || (chars + key).length > 2) {
+      if (amhChar === undefined || key === " " || newChars.length > 2) {
         setWrongCount(wrongCount + 1);
         setWrongInput(true);
 
@@ -149,7 +170,7 @@ const PoenCardAm = () => {
       >
         {!playing ? (
           <div>
-            <p className="text-2xl">ይንኩኝ</p>
+            <p className="text-2xl">Click Here</p>
           </div>
         ) : (
           <>
@@ -205,4 +226,5 @@ const PoenCardAm = () => {
   );
 };
 
-export default PoenCardAm;
+export default Poem;
+// until here
