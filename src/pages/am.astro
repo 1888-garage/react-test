@@ -2,9 +2,11 @@
 import Layout from "../layouts/Layout.astro";
 import PoenCard from "../components/PoemEn";
 import PoenCardAm from "../components/PoemAm";
+import Poem from "../components/Poem";
 ---
 
 <Layout title="home">
     <h1 class="text-center mt-10 text-xl">Amharic</h1>
-    <PoenCardAm client:load />
+    <!-- <PoenCard client:load /> -->
+    <Poem client:load lang={"am"}/>
 </Layout>
